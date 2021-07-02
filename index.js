@@ -100,7 +100,13 @@ app.get("/todaysAppointments", cors(), (req, res) => {
     res.send(result);
   });
 });
-
+app.get("/getDepartmentData", cors(), (req, res) => {
+  let sql = `SELECT * FROM Department`;
+  con.query(sql, (err, result, fields) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
 app.get("/dashboardStats", cors(), (req, res) => {
   let data = [];
   let sql = "SELECT count(*) as pCount FROM patient";
@@ -149,6 +155,28 @@ app.get("/dashboardStats", cors(), (req, res) => {
     console.log("Data: " + data[0]);
     res.send(data[0]);
   })();
+});
+
+app.post("/insertDoctorsData", cors(), (req, res) => {
+  let data = req.body;
+  console.log(data);
+  let isoDate = new Date(req.body.joinDate);
+  isoDate = isoDate.toJSON().slice(0, 10);
+  let sql =
+    `insert into doctor(fname,lname,contact,joinDate,pay,address,deptid) values (` +
+    sqlStr.escape(data.Fname) +
+    `,` +
+    sqlStr.escape(data.Lname) +
+    `,${data.contact},` +
+    sqlStr.escape(isoDate) +
+    `,${data.pay},` +
+    sqlStr.escape(data.address) +
+    `,${data.Deptid});`;
+  con.query(sql, (err, result, fields) => {
+    if (err) throw err;
+    res.send(result);
+    console.log(result);
+  });
 });
 
 app.listen("3001", () => {
