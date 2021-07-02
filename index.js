@@ -4,7 +4,7 @@ let cors = require("cors");
 let bodyParser = require("body-parser");
 let sqlStr = require("sqlstring");
 app = express();
-
+let PORT = 3001;
 let con = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -212,6 +212,6 @@ app.post("/insertPatientsData", cors(), (req, res) => {
   });
 });
 
-app.listen("3001", () => {
+app.listen(process.env.PORT || PORT, () => {
   console.log("Connected at 3000");
 });
