@@ -4,7 +4,7 @@ let cors = require("cors");
 let bodyParser = require("body-parser");
 let sqlStr = require("sqlstring");
 app = express();
-let PORT = 3001;
+
 let con = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -13,7 +13,9 @@ let con = mysql.createConnection({
 });
 
 app.use(cors());
+
 app.use(bodyParser.urlencoded({ extended: false }));
+
 con.connect(err => {
   if (err) throw err;
   console.log("Connected!");
@@ -211,7 +213,12 @@ app.post("/insertPatientsData", cors(), (req, res) => {
     console.log(result);
   });
 });
-
-app.listen(process.env.PORT || PORT, () => {
-  console.log("Connected at 3000");
+app.get("/", cors(), (req, res) => {
+  res.send("Hello World");
+});
+app.get("/favicon.ico", cors(), (req, res) => {
+  res.send("Hello World");
+});
+app.listen(process.env.PORT || 3001, () => {
+  console.log("Connected at 3001");
 });
