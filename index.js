@@ -7,10 +7,10 @@ let sqlStr = require("sqlstring");
 app = express();
 
 let con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "hospital",
+  host: "sql6.freemysqlhosting.net",
+  user: "sql6422660",
+  password: "CYJUL9iq3h",
+  database: "sql6422660",
 });
 
 app.use(cors());
@@ -24,7 +24,7 @@ con.connect(err => {
 });
 
 app.get("/getDoctorsData", cors(), (req, res) => {
-  let sql = `select CONCAT(Fname," ", Lname) as name,pay,contact,Did as "key",d.depname from doctor inner join department d on d.deptId = doctor.deptid`;
+  let sql = `select CONCAT(Fname," ", Lname) as name,pay,contact,Did as "key",d.depname from doctor inner join Department d on d.deptId = doctor.deptid`;
 
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
@@ -32,7 +32,7 @@ app.get("/getDoctorsData", cors(), (req, res) => {
   });
 });
 app.get("/getDoctorsData/:did", cors(), (req, res) => {
-  let sql = `select doctor.*,d.depName from doctor inner join department d on d.deptId = doctor.deptid where doctor.did = ${req.params.did}`;
+  let sql = `select doctor.*,d.depName from doctor inner join Department d on d.deptId = doctor.deptid where doctor.did = ${req.params.did}`;
 
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
