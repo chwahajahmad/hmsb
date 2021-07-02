@@ -4,6 +4,7 @@ let cors = require("cors");
 let bodyParser = require("body-parser");
 let sqlStr = require("sqlstring");
 app = express();
+
 let con = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -19,16 +20,17 @@ con.connect(err => {
 });
 
 app.get("/getDoctorsData", cors(), (req, res) => {
-  let sql = "select * from doctor";
+  let sql = `select CONCAT(Fname," ", Lname) as name,pay,contact,Did as "key",d.depname from doctor inner join department d on d.deptId = doctor.deptid`;
 
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
     res.send(result);
+    console.log(result);
   });
 });
 
 app.get("/getPatientsData", cors(), (req, res) => {
-  let sql = "select * from patient";
+  let sql = `select Pid as "key", Concat(Fname," ", Lname) as name, disease,contact,address from patient p`;
 
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
@@ -65,12 +67,33 @@ app.post("/insertAppointmentData", cors(), (req, res) => {
     res.send(result);
   });
 });
+app.post("/deletePatientsData", cors(), (req, res) => {
+  let data = req.body;
+  console.log(data);
+  let sql = `delete from patient where Pid = ${data.id}`;
+
+  con.query(sql, (err, result, fields) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
+
+app.post("/deleteDoctorsData", cors(), (req, res) => {
+  let data = req.body;
+  console.log(data);
+  let sql = `delete from Doctor where Did = ${data.id}`;
+
+  con.query(sql, (err, result, fields) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
 
 app.get("/todaysAppointments", cors(), (req, res) => {
   let date = new Date();
   date = date.toJSON().slice(0, 10);
   let sql =
-    `select a.appDate,a.appTime,id as "key", d.fname as dfname,d.lname as dlname,p.fname as pfname,p.Lname as plname from appointments a inner join doctor d on a.doctorId = d.Did inner join patient p on a.patientId = p.Pid where CURDATE() = ` +
+    `select a.appDate,a.appTime,id as "key", Concat(d.fname," ",d.lname) as dName, Concat(p.fname," ",p.Lname) as pName from appointments a inner join doctor d on a.doctorId = d.Did inner join patient p on a.patientId = p.Pid where CURDATE() = ` +
     sqlStr.escape(date);
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
@@ -127,6 +150,7 @@ app.get("/dashboardStats", cors(), (req, res) => {
     res.send(data[0]);
   })();
 });
+
 app.listen("3001", () => {
   console.log("Connected at 3000");
 });
