@@ -186,24 +186,20 @@ app.post("/insertDoctorsData", cors(), (req, res) => {
 
 app.post("/insertPatientsData", cors(), (req, res) => {
   let data = req.body;
-
+  console.log(data);
   let isoDate = req.body.admitDate;
   if (typeof isoDate !== "undefined") {
     isoDate = new Date(req.body.admitDate);
     isoDate = isoDate.toJSON().slice(0, 10);
   }
-
+  console.log(typeof isoDate);
   let sql =
     `insert into patient(fname,lname,contact,admitDate,disease,address,did,private_Ward_Id,general_Ward_ID,bed_no) values (` +
     sqlStr.escape(data.Fname) +
     `,` +
     sqlStr.escape(data.Lname) +
     `,${data.contact},` +
-    `${
-      typeof data.admitDate !== "undefined"
-        ? sqlStr.escape(data.admitDate)
-        : `null`
-    }` +
+    `${typeof isoDate !== "undefined" ? sqlStr.escape(isoDate) : `null`}` +
     `,${sqlStr.escape(data.disease)},` +
     sqlStr.escape(data.address) +
     `,${data.did},${
@@ -231,6 +227,37 @@ app.post("/updateDoctorsData", cors(), (req, res) => {
   },address = ${sqlStr.escape(data.address)},deptid = ${
     data.Deptid
   } where did = ${data.did};`;
+  con.query(sql, (err, result, fields) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
+
+app.post("/updatePatientsData", cors(), (req, res) => {
+  let data = req.body;
+  console.log(data);
+  let isoDate = req.body.admitDate;
+  if (typeof isoDate !== "undefined") {
+    isoDate = new Date(req.body.admitDate);
+    isoDate = isoDate.toJSON().slice(0, 10);
+  }
+  console.log(typeof isoDate);
+  let sql = `update patient set fname = ${sqlStr.escape(
+    data.Fname
+  )},lname = ${sqlStr.escape(data.Lname)},contact = ${
+    data.contact
+  },admitDate = ${
+    typeof isoDate !== "undefined" ? sqlStr.escape(isoDate) : `null`
+  },disease = ${sqlStr.escape(data.disease)},address = ${sqlStr.escape(
+    data.address
+  )},did =${data.did} ,private_Ward_Id = ${
+    data.privateWardId.length !== 0 ? data.privateWardId : `null`
+  },general_Ward_ID = ${
+    data.generalWardID.length !== 0 ? data.generalWardID : `null`
+  },bed_no = ${data.bed_no.length !== 0 ? data.bed_no : `0`} where pid = ${
+    data.Pid
+  }`;
+
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
     res.send(result);
