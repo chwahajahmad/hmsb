@@ -175,6 +175,39 @@ app.post("/insertDoctorsData", cors(), (req, res) => {
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
     res.send(result);
+  });
+});
+
+app.post("/insertPatientsData", cors(), (req, res) => {
+  let data = req.body;
+  console.log(data);
+  let isoDate = req.body.admitDate;
+  if (typeof isoDate !== "undefined") {
+    isoDate = new Date(req.body.admitDate);
+    isoDate = isoDate.toJSON().slice(0, 10);
+  }
+  console.log(typeof data.privateWardId);
+  let sql =
+    `insert into patient(fname,lname,contact,admitDate,disease,address,did,private_Ward_Id,general_Ward_ID,bed_no) values (` +
+    sqlStr.escape(data.Fname) +
+    `,` +
+    sqlStr.escape(data.Lname) +
+    `,${data.contact},` +
+    `${
+      typeof data.admitDate !== "undefined"
+        ? sqlStr.escape(data.admitDate)
+        : `null`
+    }` +
+    `,${data.disease},` +
+    sqlStr.escape(data.address) +
+    `,${data.did},${
+      data.privateWardId.length !== 0 ? data.privateWardId : `null`
+    },${data.generalWardID.length !== 0 ? data.generalWardID : `null`},${
+      data.bed_no.length !== 0 ? data.bed_no : `0`
+    });`;
+  con.query(sql, (err, result, fields) => {
+    if (err) throw err;
+    res.send(result);
     console.log(result);
   });
 });
