@@ -14,7 +14,8 @@ let con = mysql.createConnection({
 
 app.use(cors());
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json({ extended: true })); //Used to parse JSON bodies
+app.use(express.urlencoded()); //Parse URL-encoded bodies
 
 con.connect(err => {
   if (err) throw err;
@@ -182,7 +183,7 @@ app.post("/insertDoctorsData", cors(), (req, res) => {
 
 app.post("/insertPatientsData", cors(), (req, res) => {
   let data = req.body;
-  console.log(data);
+  console.log("Data: ", data);
   let isoDate = req.body.admitDate;
   if (typeof isoDate !== "undefined") {
     isoDate = new Date(req.body.admitDate);
@@ -219,6 +220,6 @@ app.get("/", cors(), (req, res) => {
 app.get("/favicon.ico", cors(), (req, res) => {
   res.send("Hello World");
 });
-app.listen(process.env.PORT || 3001, () => {
+app.listen(process.env.PORT || "3001", () => {
   console.log("Connected at 3001");
 });
