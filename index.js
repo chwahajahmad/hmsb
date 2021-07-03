@@ -1,11 +1,14 @@
-let mysql = require("mysql");
-let express = require("express");
-let cors = require("cors");
-
-let sqlStr = require("sqlstring");
+const express = require("express");
+const cors = require("cors");
+const mysql = require("mysql");
+const sqlStr = require("sqlstring");
 
 app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+//SQL DATABASE CREDENTIALS
 let con = mysql.createConnection({
   host: "sql6.freemysqlhosting.net",
   user: "sql6422660",
@@ -13,26 +16,23 @@ let con = mysql.createConnection({
   database: "sql6422660",
 });
 
-app.use(cors());
-
-app.use(express.json()); //Used to parse JSON bodies
-app.use(express.urlencoded({ extended: true })); //Parse URL-encoded bodies
-
 con.connect(err => {
   if (err) throw err;
   console.log("Connected with Database!");
 });
 
+//Get Requests
 app.get("/getDoctorsData", cors(), (req, res) => {
-  let sql = `select CONCAT(Fname," ", Lname) as name,pay,contact,Did as "key",d.depname from doctor inner join Department d on d.deptId = doctor.deptid`;
+  let sql = `select CONCAT(Fname," ", Lname) as name,pay,contact,Did as "key",d.depname from doctor inner join department d on d.deptId = doctor.deptid`;
 
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
     res.send(result);
   });
 });
+
 app.get("/getDoctorsData/:did", cors(), (req, res) => {
-  let sql = `select doctor.*,d.depName from doctor inner join Department d on d.deptId = doctor.deptid where doctor.did = ${req.params.did}`;
+  let sql = `select doctor.*,d.depName from doctor inner join department d on d.deptId = doctor.deptid where doctor.did = ${req.params.did}`;
 
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
@@ -92,7 +92,7 @@ app.post("/deletePatientsData", cors(), (req, res) => {
 app.post("/deleteDoctorsData", cors(), (req, res) => {
   let data = req.body;
 
-  let sql = `delete from Doctor where Did = ${data.id}`;
+  let sql = `delete from doctor where Did = ${data.id}`;
 
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
@@ -112,7 +112,7 @@ app.get("/todaysAppointments", cors(), (req, res) => {
   });
 });
 app.get("/getDepartmentData", cors(), (req, res) => {
-  let sql = `SELECT * FROM Department`;
+  let sql = `SELECT * FROM department`;
   con.query(sql, (err, result, fields) => {
     if (err) throw err;
     res.send(result);
@@ -155,7 +155,7 @@ app.get("/dashboardStats", cors(), (req, res) => {
     await getData(sql);
   })();
 
-  sql = "SELECT count(*) as donorCount FROM `Donor`";
+  sql = "SELECT count(*) as donorCount FROM `donor`";
   (async () => {
     await getData(sql);
 
